@@ -1357,12 +1357,12 @@
               <div class="s">github.com/tyieeee</div>
             </div>
           </div>
-          <a class="gh-link" href="https://github.com/tyieeee?tab=overview&from=2026-04-01&to=2026-04-27" target="_blank">
+          <a class="gh-link" id="gh-overview-link" href="https://github.com/tyieeee" target="_blank">
             View Overview <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
         </div>
         <div class="gh-chart">
-          <img src="https://ghchart.rshah.org/tyieeee" alt="Archie's GitHub contribution chart" loading="lazy">
+          <img id="gh-chart-img" src="https://ghchart.rshah.org/tyieeee" alt="Archie's GitHub contribution chart">
         </div>
         <div class="gh-legend">
           <span>Less</span>
@@ -1442,6 +1442,19 @@
     defer></script>
 
   <script>
+    // GitHub contribution chart — bust cache so it always refreshes
+    (function refreshGhChart(){
+      const img = document.getElementById('gh-chart-img');
+      const link = document.getElementById('gh-overview-link');
+      if (img) img.src = 'https://ghchart.rshah.org/tyieeee?t=' + Date.now();
+      if (link){
+        const today = new Date();
+        const from = new Date(today.getFullYear(), today.getMonth(), 1);
+        const fmt = d => d.toISOString().slice(0,10);
+        link.href = `https://github.com/tyieeee?tab=overview&from=${fmt(from)}&to=${fmt(today)}`;
+      }
+    })();
+
     // Theme toggle (default = dark)
     const themeBtn = document.getElementById('theme-toggle');
     const setIcon = () => {
