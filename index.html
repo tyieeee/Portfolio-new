@@ -878,13 +878,14 @@
       color: var(--text-dim); margin: 6px 2px 12px;
     }
     .gh-total b{ color: var(--text); font-weight:600; }
+    .gh-chart{ --gh-cell: 10px; --gh-gap: 2px; }
     .gh-grid{
       display:grid; grid-auto-flow: column;
-      grid-template-rows: repeat(7, 10px);
-      gap: 2px; min-width: 660px;
+      grid-template-rows: repeat(7, var(--gh-cell));
+      gap: var(--gh-gap);
     }
     .gh-cell{
-      width:10px; height:10px; border-radius:2px;
+      width: var(--gh-cell); height: var(--gh-cell); border-radius:2px;
       background: rgba(255,255,255,0.05);
       border:1px solid rgba(255,255,255,0.04);
     }
@@ -902,9 +903,17 @@
     body.light .gh-cell[data-l="4"]{ background:#216e39; border-color: rgba(0,109,50,0.5); }
     .gh-cell:hover{ outline: 1px solid var(--text); outline-offset:1px; }
     .gh-months{
-      display:flex; gap:0; min-width:660px;
+      display:flex; gap:0;
       font-family:'JetBrains Mono', monospace; font-size: 10px;
       color: var(--text-mute); padding-left: 0; margin-bottom: 6px;
+    }
+    @media (max-width: 720px){
+      .gh-chart{ --gh-cell: 11px; --gh-gap: 3px; overflow-x: hidden; padding: 12px 0 6px; }
+      .gh-months{ font-size: 10px; }
+    }
+    @media (max-width: 380px){
+      .gh-chart{ --gh-cell: 9px; --gh-gap: 2px; }
+      .gh-months{ font-size: 9px; }
     }
     /* Stat cards */
     .gh-stats{
@@ -1568,8 +1577,12 @@
           const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last&_=${Date.now()}`, { cache: 'no-store' });
           if (!res.ok) throw new Error('API error ' + res.status);
           const data = await res.json();
-          const days = data.contributions || [];
-          const yearTotal = (data.total && (data.total.lastYear ?? Object.values(data.total)[0])) || days.reduce((s,d)=>s+(d.count||0),0);
+          const allDays = data.contributions || [];
+          const yearTotal = (data.total && (data.total.lastYear ?? Object.values(data.total)[0])) || allDays.reduce((s,d)=>s+(d.count||0),0);
+
+          // On mobile, show only the last ~6 months so recent (green) squares are visible
+          const isMobile = window.matchMedia('(max-width: 720px)').matches;
+          const days = isMobile ? allDays.slice(-7 * 26) : allDays;
 
           const first = new Date(days[0].date);
           const pad = first.getDay();
@@ -1591,7 +1604,10 @@
           grid.appendChild(frag);
 
           const weekCount = Math.ceil(cells.length / 7);
-          const colWidth = 10 + 2;
+          const cs = getComputedStyle(document.querySelector('.gh-chart'));
+          const cellPx = parseFloat(cs.getPropertyValue('--gh-cell')) || 10;
+          const gapPx  = parseFloat(cs.getPropertyValue('--gh-gap'))  || 2;
+          const colWidth = cellPx + gapPx;
           months.style.minWidth = (weekCount * colWidth) + 'px';
           months.innerHTML = '';
           const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
