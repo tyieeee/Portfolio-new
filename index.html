@@ -880,11 +880,11 @@
     .gh-total b{ color: var(--text); font-weight:600; }
     .gh-grid{
       display:grid; grid-auto-flow: column;
-      grid-template-rows: repeat(7, 12px);
-      gap: 3px; min-width: 760px;
+      grid-template-rows: repeat(7, 10px);
+      gap: 2px; min-width: 660px;
     }
     .gh-cell{
-      width:12px; height:12px; border-radius:2px;
+      width:10px; height:10px; border-radius:2px;
       background: rgba(255,255,255,0.05);
       border:1px solid rgba(255,255,255,0.04);
     }
@@ -902,9 +902,49 @@
     body.light .gh-cell[data-l="4"]{ background:#216e39; border-color: rgba(0,109,50,0.5); }
     .gh-cell:hover{ outline: 1px solid var(--text); outline-offset:1px; }
     .gh-months{
-      display:flex; gap:0; min-width:760px;
+      display:flex; gap:0; min-width:660px;
       font-family:'JetBrains Mono', monospace; font-size: 10px;
       color: var(--text-mute); padding-left: 0; margin-bottom: 6px;
+    }
+    /* Stat cards */
+    .gh-stats{
+      margin-top: 22px;
+      display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .gh-stat{
+      border:1px solid var(--line); border-radius: 14px;
+      background: var(--bg);
+      padding: 22px 20px;
+      display:flex; flex-direction:column; gap: 10px;
+      text-decoration:none; color: inherit;
+      transition: border-color .25s ease, transform .25s ease, background .25s ease;
+    }
+    .gh-stat:hover{
+      border-color: var(--line-strong);
+      background: var(--bg-card);
+      transform: translateY(-3px);
+    }
+    .gh-stat .gs-head{
+      display:flex; align-items:center; gap:10px;
+      color: var(--text-dim); font-size: 12px;
+      font-family:'JetBrains Mono', monospace;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .gh-stat .gs-head i{ font-size: 14px; color: var(--text); }
+    .gh-stat .gs-num{
+      font-family:'Bank Gothic', 'BankGothic Md BT', 'Big Shoulders Display', system-ui, sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4vw, 2.6rem);
+      letter-spacing: 0.02em;
+      color: var(--text);
+      line-height: 1;
+    }
+    .gh-stat .gs-sub{
+      font-size: 12px; color: var(--text-mute);
+      font-family:'JetBrains Mono', monospace;
+    }
+    @media (max-width: 720px){
+      .gh-stats{ grid-template-columns: 1fr; }
     }
     .gh-months span{ flex: 0 0 auto; }
     .gh-loading, .gh-error{
@@ -1205,7 +1245,7 @@
 };</pre>
           <div class="ac-stats">
             <div class="ac-stat"><div class="num">3+</div><div class="lbl">Years coding</div></div>
-            <div class="ac-stat"><div class="num">10+</div><div class="lbl">Projects</div></div>
+            <div class="ac-stat"><div class="num" id="ac-projects">—</div><div class="lbl">Projects</div></div>
             <div class="ac-stat"><div class="num">3</div><div class="lbl">Certificates</div></div>
           </div>
         </div>
@@ -1406,6 +1446,24 @@
           <span class="gh-cell" data-l="4"></span>
           <span>More</span>
         </div>
+
+        <div class="gh-stats">
+          <a class="gh-stat" href="https://github.com/tyieeee" target="_blank" rel="noopener">
+            <div class="gs-head"><i class="fa-solid fa-chart-simple"></i> Contributions</div>
+            <div class="gs-num" id="gs-contrib">—</div>
+            <div class="gs-sub">in the last year</div>
+          </a>
+          <a class="gh-stat" href="https://github.com/tyieeee?tab=overview" target="_blank" rel="noopener">
+            <div class="gs-head"><i class="fa-solid fa-code-commit"></i> Commits</div>
+            <div class="gs-num" id="gs-commits">—</div>
+            <div class="gs-sub">recent public pushes</div>
+          </a>
+          <a class="gh-stat" href="https://github.com/tyieeee?tab=repositories" target="_blank" rel="noopener">
+            <div class="gs-head"><i class="fa-solid fa-folder-open"></i> Projects</div>
+            <div class="gs-num" id="gs-projects">—</div>
+            <div class="gs-sub">public repositories</div>
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -1476,80 +1534,119 @@
     defer></script>
 
   <script>
-    // GitHub contributions — live heatmap (always fresh)
-    (async function renderGhChart(){
-      const grid = document.getElementById('gh-grid');
-      const months = document.getElementById('gh-months');
-      const total = document.getElementById('gh-total');
-      const link = document.getElementById('gh-overview-link');
+    // GitHub — live heatmap + count cards
+    (function ghInit(){
       const USER = 'tyieeee';
-
-      // Update overview link with current month-to-today range
+      const link = document.getElementById('gh-overview-link');
       if (link){
         const today = new Date();
         const from = new Date(today.getFullYear(), today.getMonth(), 1);
         const fmt = d => d.toISOString().slice(0,10);
         link.href = `https://github.com/${USER}?tab=overview&from=${fmt(from)}&to=${fmt(today)}`;
       }
-      if (!grid) return;
 
-      try{
-        const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last&_=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('API error ' + res.status);
-        const data = await res.json();
-        const days = data.contributions || [];
-        const lastYearTotal = (data.total && (data.total.lastYear ?? Object.values(data.total)[0])) || days.reduce((s,d)=>s+(d.count||0),0);
+      const animateNum = (el, target) => {
+        if (!el) return;
+        const start = performance.now(), dur = 900;
+        const step = t => {
+          const p = Math.min(1, (t - start) / dur);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased).toLocaleString();
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
 
-        // Pad start so first column begins on Sunday
-        const first = new Date(days[0].date);
-        const pad = first.getDay(); // 0..6
-        const cells = [];
-        for (let i=0;i<pad;i++) cells.push(null);
-        days.forEach(d => cells.push(d));
+      // Heatmap + contribution count
+      (async function(){
+        const grid = document.getElementById('gh-grid');
+        const months = document.getElementById('gh-months');
+        const total = document.getElementById('gh-total');
+        const numEl = document.getElementById('gs-contrib');
+        if (!grid) return;
+        try{
+          const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last&_=${Date.now()}`, { cache: 'no-store' });
+          if (!res.ok) throw new Error('API error ' + res.status);
+          const data = await res.json();
+          const days = data.contributions || [];
+          const yearTotal = (data.total && (data.total.lastYear ?? Object.values(data.total)[0])) || days.reduce((s,d)=>s+(d.count||0),0);
 
-        grid.innerHTML = '';
-        const frag = document.createDocumentFragment();
-        cells.forEach(d => {
-          const el = document.createElement('div');
-          el.className = 'gh-cell';
-          if (d){
-            el.dataset.l = String(d.level || 0);
-            el.title = `${d.count} contribution${d.count===1?'':'s'} on ${d.date}`;
-          } else {
-            el.style.visibility = 'hidden';
+          const first = new Date(days[0].date);
+          const pad = first.getDay();
+          const cells = [];
+          for (let i=0;i<pad;i++) cells.push(null);
+          days.forEach(d => cells.push(d));
+
+          grid.innerHTML = '';
+          const frag = document.createDocumentFragment();
+          cells.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'gh-cell';
+            if (d){
+              el.dataset.l = String(d.level || 0);
+              el.title = `${d.count} contribution${d.count===1?'':'s'} on ${d.date}`;
+            } else { el.style.visibility = 'hidden'; }
+            frag.appendChild(el);
+          });
+          grid.appendChild(frag);
+
+          const weekCount = Math.ceil(cells.length / 7);
+          const colWidth = 10 + 2;
+          months.style.minWidth = (weekCount * colWidth) + 'px';
+          months.innerHTML = '';
+          const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          let lastMonth = -1;
+          for (let w=0; w<weekCount; w++){
+            const idx = w*7;
+            const day = cells[idx] || cells[idx+1] || cells[idx+2];
+            const span = document.createElement('span');
+            span.style.width = colWidth + 'px';
+            if (day){
+              const m = new Date(day.date).getMonth();
+              if (m !== lastMonth){ span.textContent = M[m]; lastMonth = m; }
+            }
+            months.appendChild(span);
           }
-          frag.appendChild(el);
-        });
-        grid.appendChild(frag);
-
-        // Month labels positioned by week column
-        const weekCount = Math.ceil(cells.length / 7);
-        const colWidth = 12 + 3; // cell + gap
-        months.style.minWidth = (weekCount * colWidth) + 'px';
-        months.innerHTML = '';
-        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        let lastMonth = -1;
-        for (let w=0; w<weekCount; w++){
-          const idx = w*7;
-          const day = cells[idx] || cells[idx+1] || cells[idx+2];
-          const span = document.createElement('span');
-          span.style.width = colWidth + 'px';
-          if (day){
-            const m = new Date(day.date).getMonth();
-            if (m !== lastMonth){ span.textContent = monthNames[m]; lastMonth = m; }
-          }
-          months.appendChild(span);
+          if (total) total.innerHTML = `<b>${yearTotal.toLocaleString()}</b> contributions in the last year`;
+          animateNum(numEl, yearTotal);
+        } catch(err){
+          console.error('Heatmap failed:', err);
+          if (total) total.textContent = 'Could not load contributions right now.';
+          if (numEl) numEl.textContent = '—';
         }
+      })();
 
-        if (total) total.innerHTML = `<b>${lastYearTotal.toLocaleString()}</b> contributions in the last year`;
-      } catch(err){
-        console.error('GitHub chart failed:', err);
-        if (total) total.textContent = 'Could not load contributions right now.';
-        // Fallback: ghchart image
-        if (grid){
-          grid.outerHTML = `<img src="https://ghchart.rshah.org/${USER}?t=${Date.now()}" alt="GitHub contributions" style="width:100%;min-width:720px;filter:invert(1) hue-rotate(180deg) brightness(.95);">`;
+      // Commit count from public events
+      (async function(){
+        const numEl = document.getElementById('gs-commits');
+        try{
+          const res = await fetch(`https://api.github.com/users/${USER}/events/public?per_page=100&_=${Date.now()}`, { cache: 'no-store' });
+          if (!res.ok) throw new Error('API error ' + res.status);
+          const events = await res.json();
+          const count = events
+            .filter(ev => ev.type === 'PushEvent' && ev.payload && Array.isArray(ev.payload.commits))
+            .reduce((s, ev) => s + ev.payload.commits.length, 0);
+          animateNum(numEl, count);
+        } catch(err){ console.error('Commits failed:', err); if (numEl) numEl.textContent = '—'; }
+      })();
+
+      // Project count from repos (drives both the GitHub card and About stat)
+      (async function(){
+        const numEl = document.getElementById('gs-projects');
+        const acEl = document.getElementById('ac-projects');
+        try{
+          const res = await fetch(`https://api.github.com/users/${USER}?_=${Date.now()}`, { cache: 'no-store' });
+          if (!res.ok) throw new Error('API error ' + res.status);
+          const data = await res.json();
+          const count = data.public_repos || 0;
+          animateNum(numEl, count);
+          animateNum(acEl, count);
+        } catch(err){
+          console.error('Projects failed:', err);
+          if (numEl) numEl.textContent = '—';
+          if (acEl) acEl.textContent = '—';
         }
-      }
+      })();
     })();
 
     // Theme toggle (default = dark)
