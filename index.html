@@ -248,6 +248,27 @@
     }
     .hero-jr .jr-hire:hover{ gap:22px; color: var(--text-dim); }
     .hero-jr .jr-hire i{ font-size:0.95rem; }
+    .hero-jr .jr-cv{
+      margin-top: 28px;
+      align-self: flex-end;
+      display:inline-flex; align-items:center; gap:12px;
+      padding: 12px 22px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      font-family:'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text); text-decoration:none;
+      background: transparent;
+      transition: background .25s ease, color .25s ease, border-color .25s ease, transform .25s ease;
+    }
+    .hero-jr .jr-cv:hover{
+      background: var(--text); color: var(--bg);
+      border-color: var(--text);
+      transform: translateY(-2px);
+    }
+    .hero-jr .jr-cv i{ font-size: 0.9rem; }
     .hero-jr .jr-services{
       display:flex; flex-direction:column; gap:14px;
       align-items:flex-end; text-align:right;
@@ -353,6 +374,7 @@
         flex-direction:row; flex-wrap:wrap; gap: 10px 18px;
         font-size: .9rem;
       }
+      .hero-jr .jr-cv{ align-self: flex-start; margin-top: 18px; font-size: .8rem; padding: 11px 20px; }
       .hero-jr .jr-services span.active{ font-weight:700; }
       .hero-jr .jr-brands{ margin-top: 28px; padding: 22px 0 4px; }
       .hero-jr .jr-brands-track{ gap: 40px; animation-duration: 22s; }
@@ -997,24 +1019,84 @@
 
     /* ============ CONTACT ============ */
     .contact{
-      margin-top: 60px;
-      padding: 80px 40px;
-      border-radius: 28px;
-      border: 1px solid var(--line);
-      background:
-        radial-gradient(800px 400px at 50% 0%, color-mix(in srgb, var(--text) 8%, transparent), transparent 70%),
-        var(--bg-elev);
-      text-align:center;
+      margin-top: 40px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      text-align: center;
     }
-    .contact h2{
-      font-family:'Bank Gothic', 'BankGothic Md BT', 'Bank Gothic Medium BT', 'Big Shoulders Display', 'Copperplate', system-ui, sans-serif;
-      font-weight:600;
-      font-size: clamp(2.2rem, 6vw, 4rem); letter-spacing: 0.04em; line-height:1.05;
-      text-transform: uppercase;
-      margin-bottom: 18px;
+    .contact .contact-sub{
+      color: var(--text-dim);
+      margin: 14px auto 44px;
+      max-width: 620px;
+      font-size: 1rem; line-height: 1.6;
     }
-    .contact p{ color:var(--text-dim); margin-bottom: 28px; }
-    .socials{ display:flex; gap:14px; justify-content:center; margin-top:28px; }
+    /* Contact form — minimal underline style */
+    .contact-form{
+      max-width: 720px; margin: 0 auto;
+      display:grid; gap: 28px; text-align:left;
+    }
+    .contact-form .row{
+      display:grid; grid-template-columns: 1fr 1fr; gap: 28px;
+    }
+    .contact-form label{
+      display:flex; flex-direction:column; gap:10px;
+      font-family:'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--text-mute);
+      text-transform: uppercase; letter-spacing: 0.12em;
+    }
+    .contact-form input,
+    .contact-form textarea{
+      width:100%; padding: 10px 0;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      color: var(--text);
+      font: 400 15px 'Inter', sans-serif;
+      transition: border-color .25s ease;
+      resize: vertical;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder{ color: var(--text-mute); }
+    .contact-form input:focus,
+    .contact-form textarea:focus{
+      outline: none;
+      border-bottom-color: var(--text);
+    }
+    .contact-form textarea{ min-height: 110px; line-height: 1.6; }
+    .contact-form .submit-row{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 14px; margin-top: 6px; flex-wrap: wrap;
+    }
+    .contact-form button{
+      cursor:pointer; border:0; font: 600 14px 'Inter', sans-serif;
+      padding: 14px 24px; border-radius: 999px;
+      background: var(--text); color: var(--bg);
+      display:inline-flex; align-items:center; gap: 10px;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    .contact-form button:hover{ transform: translateY(-2px); }
+    .contact-form button:disabled{ opacity:.55; cursor: wait; transform:none; }
+    .contact-form .form-hint{
+      font-family:'JetBrains Mono', monospace; font-size: 11.5px;
+      color: var(--text-mute);
+    }
+    .contact-form .form-status{
+      font-family:'JetBrains Mono', monospace; font-size: 12.5px;
+      padding: 12px 14px; border-radius: 10px;
+      border: 1px solid var(--line); background: var(--bg);
+      display:none;
+    }
+    .contact-form .form-status.show{ display:block; }
+    .contact-form .form-status.ok{ color: #39d353; border-color: rgba(57,211,83,0.35); }
+    .contact-form .form-status.err{ color: #ff6b6b; border-color: rgba(255,107,107,0.35); }
+    @media (max-width: 640px){
+      .contact-form .row{ grid-template-columns: 1fr; }
+      .contact-form .submit-row{ justify-content: stretch; }
+      .contact-form button{ width:100%; justify-content:center; }
+    }
+    .socials{ display:flex; gap:14px; justify-content:center; margin: 36px auto 0; padding-top: 28px; border-top: 1px solid var(--line); max-width: 720px; }
     .socials a{
       width: 42px; height: 42px; border-radius: 50%;
       border: 1px solid var(--line-strong);
@@ -1066,7 +1148,7 @@
       .gh-chart img{ min-width: 0; }
       .cert-grid{ grid-template-columns: 1fr; }
       section.block{ padding: 80px 0; }
-      .contact{ padding: 56px 22px; }
+      .contact{ padding: 0; }
       .marquee-track{ font-size: 1.1rem; }
       .marquee-track i{ font-size: 1.25rem; }
       .marquee-track > span{ padding-right: 56px; }
@@ -1078,7 +1160,6 @@
       .hero h1{ font-size: clamp(2.4rem, 11vw, 4rem); letter-spacing: 0.02em; line-height: 1.05; }
       .hero p.tag{ font-size: 0.95rem; }
       .section-title{ font-size: clamp(2rem, 8vw, 3rem); letter-spacing: 0.02em; }
-      .contact h2{ font-size: clamp(1.8rem, 7vw, 2.6rem); letter-spacing: 0.02em; }
       .about-card, .journey-card, .gh-card{ padding: 22px 18px; }
       .ac-code{ font-size: 12px; line-height: 1.7; }
       .jc-code{ font-size: 12px; line-height: 1.7; }
@@ -1128,7 +1209,7 @@
       .p-media.contain .num{ top: 28px; left: 14px; }
       .gh-chart img{ min-width: 0; width: 100%; }
       section.block{ padding: 64px 0; }
-      .contact{ padding: 44px 18px; border-radius: 22px; }
+      .contact{ padding: 0; border-radius: 0; }
       .socials a{ width: 38px; height: 38px; }
       .ac-stat .num{ font-size: 1.25rem; }
       .ac-stat .lbl{ font-size: 9px; }
@@ -1151,7 +1232,7 @@
   <nav class="nav" id="nav">
     <a href="#top" class="brand">
       <span class="brand-mark">A</span>
-      <span>archie<span style="color:var(--text-mute)">.dev</span></span>
+      <span>itzrr<span style="color:var(--text-mute)">.dev</span></span>
     </a>
     <div class="nav-links">
       <a href="#about">About</a>
@@ -1180,7 +1261,7 @@
       <div class="jr-body">
         <div class="jr-left">
           <p class="jr-intro">Hey there! I'm a Front-End Developer &amp; UI / UX Designer crafting clean, modern digital experiences.</p>
-          <a class="jr-hire" href="mailto:delacruzarchie21@gmail.com">// HIRE ME <i class="fa-solid fa-arrow-right"></i></a>
+          <a class="jr-hire" href="#contact">// HIRE ME <i class="fa-solid fa-arrow-right"></i></a>
         </div>
         <div class="jr-mid" aria-hidden="true"></div>
         <div class="jr-services">
@@ -1188,6 +1269,9 @@
           <span class="active">Front-End Development</span>
           <span>UI / UX Design</span>
           <span>Design Consultancy</span>
+          <a class="jr-cv" href="cv/Archie_Dela_Cruz_CV.pdf" download>
+            <i class="fa-solid fa-download"></i> Download CV
+          </a>
         </div>
       </div>
     </div>
@@ -1413,7 +1497,7 @@
             <h3>Chroma<span class="it">Fit</span></h3>
             <p>A modern outfit styling app that helps users find the perfect clothing combinations based on selected color palettes. With vibrant, color-driven dashboards, smart outfit suggestions, and personalized style recommendations, it makes fashion matching simple, stylish, and visually inspiring.</p>
             <div class="p-tags"><span>React</span><span>TypeScript</span><span>Tailwind</span><span>UI/UX</span></div>
-            <a class="btn btn-ghost" href="#" target="_blank">View Project <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <a class="btn btn-ghost" href="https://chromafit-lemon.vercel.app/" target="_blank">View Project <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
           </div>
         </article>
 
@@ -1517,10 +1601,42 @@
   <section class="block" id="contact">
     <div class="wrap">
       <div class="contact reveal">
-        <span class="eyebrow">Contact</span>
-        <h2>Let's build something <span class="it">remarkable</span>.</h2>
-        <p>Have a project in mind, or just want to say hi? My inbox is always open.</p>
-        <a class="btn btn-primary" href="mailto:delacruzarchie21@gmail.com"><i class="fa-solid fa-envelope"></i> delacruzarchie21@gmail.com</a>
+        <span class="eyebrow reveal">Get in Touch</span>
+        <h2 class="section-title reveal">Let's build something <span class="it">remarkable</span>.</h2>
+        <p class="contact-sub reveal">Have a project in mind, or just want to say hi? Drop a message below — it lands straight in my inbox.</p>
+
+        <form class="contact-form reveal" id="contact-form" action="https://formsubmit.co/delacruzarchie21@gmail.com" method="POST" novalidate>
+          <!-- FormSubmit settings -->
+          <input type="hidden" name="_subject" value="New message from your portfolio">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://itzrr.dev/?sent=1">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+          <div class="row">
+            <label>Name
+              <input type="text" name="name" placeholder="Your name" required autocomplete="name">
+            </label>
+            <label>Email
+              <input type="email" name="email" placeholder="you@email.com" required autocomplete="email">
+            </label>
+          </div>
+          <label>Subject
+            <input type="text" name="subject" placeholder="Project, collab, or just hi" required>
+          </label>
+          <label>Message
+            <textarea name="message" placeholder="Tell me a bit about what you have in mind…" required></textarea>
+          </label>
+
+          <div class="submit-row">
+            <span class="form-hint"><i class="fa-solid fa-lock"></i> Sent securely to delacruzarchie21@gmail.com</span>
+            <button type="submit" id="contact-submit">
+              <i class="fa-solid fa-paper-plane"></i> Send Message
+            </button>
+          </div>
+          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+        </form>
+
         <div class="socials">
           <a href="https://www.linkedin.com/in/archie-dela-cruz-105065334/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
           <a href="https://www.instagram.com/itzrr.exe/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -1663,6 +1779,48 @@
           if (acEl) acEl.textContent = '—';
         }
       })();
+    })();
+
+    // Contact form — AJAX submit to FormSubmit, inline status (no redirect)
+    (function initContactForm(){
+      const form = document.getElementById('contact-form');
+      if (!form) return;
+      const btn = document.getElementById('contact-submit');
+      const status = document.getElementById('form-status');
+      const setStatus = (msg, kind) => {
+        status.textContent = msg;
+        status.className = 'form-status show ' + (kind || '');
+      };
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (form._honey && form._honey.value) return; // bot trap
+        const data = new FormData(form);
+        btn.disabled = true;
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+        setStatus('', '');
+        try{
+          const res = await fetch(`https://formsubmit.co/ajax/delacruzarchie21@gmail.com`, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: data
+          });
+          const json = await res.json().catch(() => ({}));
+          if (res.ok && (json.success === 'true' || json.success === true)){
+            setStatus('✓ Message sent! I\'ll get back to you soon.', 'ok');
+            form.reset();
+          } else {
+            const msg = (json && json.message) ? json.message : 'Something went wrong. Please try again or email me directly.';
+            setStatus('✗ ' + msg, 'err');
+          }
+        } catch(err){
+          console.error(err);
+          setStatus('✗ Network error. Please try again later.', 'err');
+        } finally{
+          btn.disabled = false;
+          btn.innerHTML = original;
+        }
+      });
     })();
 
     // Theme toggle (default = dark)
