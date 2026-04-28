@@ -1607,10 +1607,25 @@
 
         <form class="contact-form reveal" id="contact-form" action="https://formsubmit.co/delacruzarchie21@gmail.com" method="POST" novalidate>
           <!-- FormSubmit settings -->
-          <input type="hidden" name="_subject" value="New message from your portfolio">
-          <input type="hidden" name="_template" value="table">
+          <input type="hidden" id="cf-subject" name="_subject" value="New message from your portfolio">
+          <input type="hidden" name="_template" value="box">
           <input type="hidden" name="_captcha" value="false">
           <input type="hidden" name="_next" value="https://itzrr.dev/?sent=1">
+          <input type="hidden" name="_autoresponse" value="Hey there — Archie here.
+
+Thanks for reaching out through itzrr.dev. Your message has landed in my inbox and I'll personally read every line of it.
+
+I usually reply within 1–2 business days. If your project is time-sensitive, just hit reply on this email and add a quick note.
+
+In the meantime, feel free to peek at my latest work and code:
+• Portfolio: https://itzrr.dev
+• GitHub:    https://github.com/tyieeee
+• LinkedIn:  https://www.linkedin.com/in/archie-dela-cruz-105065334/
+
+Talk soon,
+Archie Dela Cruz
+Front-End Developer & UI / UX Designer
+delacruzarchie21@gmail.com">
           <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
 
           <div class="row">
@@ -1794,6 +1809,11 @@
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (form._honey && form._honey.value) return; // bot trap
+        // Dynamic subject so inbox previews who/what at a glance
+        const nm = (form.name?.value || 'Visitor').trim();
+        const sj = (form.subject?.value || 'Portfolio inquiry').trim();
+        const subjEl = document.getElementById('cf-subject');
+        if (subjEl) subjEl.value = `Portfolio · ${nm} — ${sj}`;
         const data = new FormData(form);
         btn.disabled = true;
         const original = btn.innerHTML;
