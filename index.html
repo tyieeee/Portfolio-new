@@ -871,14 +871,45 @@
     .gh-link:hover{ background: var(--bg-card); color: var(--text); }
     .gh-chart{
       width:100%; overflow-x:auto;
-      padding: 8px 4px; border-top: 1px solid var(--line);
+      padding: 12px 4px 6px; border-top: 1px solid var(--line);
     }
-    .gh-chart img{
-      width:100%; min-width: 720px; height:auto;
-      filter: invert(0); /* dark-mode tint applied below */
+    .gh-total{
+      font-family:'JetBrains Mono', monospace; font-size: 12px;
+      color: var(--text-dim); margin: 6px 2px 12px;
     }
-    body:not(.light) .gh-chart img{
-      filter: invert(1) hue-rotate(180deg) brightness(0.95);
+    .gh-total b{ color: var(--text); font-weight:600; }
+    .gh-grid{
+      display:grid; grid-auto-flow: column;
+      grid-template-rows: repeat(7, 12px);
+      gap: 3px; min-width: 760px;
+    }
+    .gh-cell{
+      width:12px; height:12px; border-radius:2px;
+      background: rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.04);
+    }
+    body.light .gh-cell{
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.04);
+    }
+    .gh-cell[data-l="1"]{ background:#0e4429; border-color: rgba(57,211,83,0.15); }
+    .gh-cell[data-l="2"]{ background:#006d32; border-color: rgba(57,211,83,0.25); }
+    .gh-cell[data-l="3"]{ background:#26a641; border-color: rgba(57,211,83,0.35); }
+    .gh-cell[data-l="4"]{ background:#39d353; border-color: rgba(57,211,83,0.55); }
+    body.light .gh-cell[data-l="1"]{ background:#9be9a8; border-color: rgba(0,109,50,0.2); }
+    body.light .gh-cell[data-l="2"]{ background:#40c463; border-color: rgba(0,109,50,0.3); }
+    body.light .gh-cell[data-l="3"]{ background:#30a14e; border-color: rgba(0,109,50,0.4); }
+    body.light .gh-cell[data-l="4"]{ background:#216e39; border-color: rgba(0,109,50,0.5); }
+    .gh-cell:hover{ outline: 1px solid var(--text); outline-offset:1px; }
+    .gh-months{
+      display:flex; gap:0; min-width:760px;
+      font-family:'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--text-mute); padding-left: 0; margin-bottom: 6px;
+    }
+    .gh-months span{ flex: 0 0 auto; }
+    .gh-loading, .gh-error{
+      padding: 24px 8px; color: var(--text-mute);
+      font-family:'JetBrains Mono', monospace; font-size: 12px;
     }
     .gh-legend{
       display:flex; align-items:center; gap: 10px;
@@ -1361,15 +1392,18 @@
             View Overview <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
         </div>
+        <div class="gh-total" id="gh-total">Loading contributions…</div>
         <div class="gh-chart">
-          <img id="gh-chart-img" src="https://ghchart.rshah.org/tyieeee" alt="Archie's GitHub contribution chart">
+          <div class="gh-months" id="gh-months" aria-hidden="true"></div>
+          <div class="gh-grid" id="gh-grid" role="img" aria-label="GitHub contribution heatmap"></div>
         </div>
         <div class="gh-legend">
           <span>Less</span>
-          <span class="sq" style="opacity:.25"></span>
-          <span class="sq" style="opacity:.5"></span>
-          <span class="sq" style="opacity:.75"></span>
-          <span class="sq"></span>
+          <span class="gh-cell" data-l="0"></span>
+          <span class="gh-cell" data-l="1"></span>
+          <span class="gh-cell" data-l="2"></span>
+          <span class="gh-cell" data-l="3"></span>
+          <span class="gh-cell" data-l="4"></span>
           <span>More</span>
         </div>
       </div>
@@ -1442,16 +1476,79 @@
     defer></script>
 
   <script>
-    // GitHub contribution chart — bust cache so it always refreshes
-    (function refreshGhChart(){
-      const img = document.getElementById('gh-chart-img');
+    // GitHub contributions — live heatmap (always fresh)
+    (async function renderGhChart(){
+      const grid = document.getElementById('gh-grid');
+      const months = document.getElementById('gh-months');
+      const total = document.getElementById('gh-total');
       const link = document.getElementById('gh-overview-link');
-      if (img) img.src = 'https://ghchart.rshah.org/tyieeee?t=' + Date.now();
+      const USER = 'tyieeee';
+
+      // Update overview link with current month-to-today range
       if (link){
         const today = new Date();
         const from = new Date(today.getFullYear(), today.getMonth(), 1);
         const fmt = d => d.toISOString().slice(0,10);
-        link.href = `https://github.com/tyieeee?tab=overview&from=${fmt(from)}&to=${fmt(today)}`;
+        link.href = `https://github.com/${USER}?tab=overview&from=${fmt(from)}&to=${fmt(today)}`;
+      }
+      if (!grid) return;
+
+      try{
+        const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last&_=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error('API error ' + res.status);
+        const data = await res.json();
+        const days = data.contributions || [];
+        const lastYearTotal = (data.total && (data.total.lastYear ?? Object.values(data.total)[0])) || days.reduce((s,d)=>s+(d.count||0),0);
+
+        // Pad start so first column begins on Sunday
+        const first = new Date(days[0].date);
+        const pad = first.getDay(); // 0..6
+        const cells = [];
+        for (let i=0;i<pad;i++) cells.push(null);
+        days.forEach(d => cells.push(d));
+
+        grid.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        cells.forEach(d => {
+          const el = document.createElement('div');
+          el.className = 'gh-cell';
+          if (d){
+            el.dataset.l = String(d.level || 0);
+            el.title = `${d.count} contribution${d.count===1?'':'s'} on ${d.date}`;
+          } else {
+            el.style.visibility = 'hidden';
+          }
+          frag.appendChild(el);
+        });
+        grid.appendChild(frag);
+
+        // Month labels positioned by week column
+        const weekCount = Math.ceil(cells.length / 7);
+        const colWidth = 12 + 3; // cell + gap
+        months.style.minWidth = (weekCount * colWidth) + 'px';
+        months.innerHTML = '';
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        let lastMonth = -1;
+        for (let w=0; w<weekCount; w++){
+          const idx = w*7;
+          const day = cells[idx] || cells[idx+1] || cells[idx+2];
+          const span = document.createElement('span');
+          span.style.width = colWidth + 'px';
+          if (day){
+            const m = new Date(day.date).getMonth();
+            if (m !== lastMonth){ span.textContent = monthNames[m]; lastMonth = m; }
+          }
+          months.appendChild(span);
+        }
+
+        if (total) total.innerHTML = `<b>${lastYearTotal.toLocaleString()}</b> contributions in the last year`;
+      } catch(err){
+        console.error('GitHub chart failed:', err);
+        if (total) total.textContent = 'Could not load contributions right now.';
+        // Fallback: ghchart image
+        if (grid){
+          grid.outerHTML = `<img src="https://ghchart.rshah.org/${USER}?t=${Date.now()}" alt="GitHub contributions" style="width:100%;min-width:720px;filter:invert(1) hue-rotate(180deg) brightness(.95);">`;
+        }
       }
     })();
 
