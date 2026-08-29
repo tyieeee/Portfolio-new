@@ -146,6 +146,13 @@
        on lower-power phones. Freeze them there — still visible, just not drifting. */
     @media (max-width: 900px){
       .orb{ animation: none; filter: blur(64px); }
+      /* position:fixed backgrounds force a repaint of this whole layer on every scroll
+         frame on many mobile browsers, especially combined with blur/mask/SVG-noise —
+         this is the main cause of heavy/janky scrolling on phones. Switch to a normal
+         absolute layer scoped to the first screen so it scrolls away like anything else
+         (it already fades to transparent, so nothing looks different below it). */
+      .ambient{ position:absolute; height:100vh; }
+      .ambient::after{ display:none; }
     }
 
     @keyframes dotPulse{
