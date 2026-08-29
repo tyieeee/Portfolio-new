@@ -193,6 +193,7 @@
       transition: background .25s ease, transform .25s ease;
     }
     .theme-btn:hover{ background: var(--bg-card); transform: rotate(20deg); }
+    .nav-actions{ display:flex; align-items:center; gap:10px; flex:none; }
     .nav-burger{
       display:none;
       background: transparent;
@@ -297,9 +298,6 @@
     @media (min-width: 901px){
       .nav-burger{ display:none !important; }
       .mobile-menu{ display:none; }
-    }
-    @media (max-width: 900px){
-      .nav .theme-btn{ display:none; }
     }
 
     /* Floating dot-line scrollspy nav on scroll (desktop only) — logo & theme toggle stay put in the
@@ -420,6 +418,7 @@
       max-width: 1280px; width:100%; margin:0 auto;
       position:relative; flex:1;
       display:flex; flex-direction:column;
+      overflow:hidden;
     }
     /* Ghost background name */
     .hero-jr .jr-ghost{
@@ -437,7 +436,7 @@
     }
     /* Main name */
     .hero-jr .jr-name{
-      position:relative; z-index:3;
+      position:relative; z-index:2;
       font-family:'Big Shoulders Display', 'Bank Gothic', system-ui, sans-serif;
       font-weight:800;
       font-size: clamp(3.2rem, 11vw, 10rem);
@@ -452,7 +451,7 @@
       position:absolute; left:50%; top:54%;
       transform: translate(-50%, -50%);
       width: clamp(320px, 38vw, 560px);
-      z-index:2;
+      z-index:3;
     }
     .hero-jr .jr-portrait::before{
       content:""; position:absolute; inset:-6% -10% -2% -10%;
@@ -465,6 +464,21 @@
     .hero-jr .jr-portrait img{
       width:100%; height:auto; display:block;
       filter: drop-shadow(0 30px 60px rgba(0,0,0,0.45));
+    }
+    .hero-jr .jr-honor{
+      position:absolute; left:16px; top:68%; z-index:1;
+      display:inline-flex; align-items:center; gap:7px;
+      padding:8px 14px; border-radius:999px;
+      background: rgba(10,10,10,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,0.16);
+      color:#fff; font-size:12px; font-weight:600; letter-spacing:.04em;
+      text-transform:uppercase; white-space:nowrap;
+    }
+    .hero-jr .jr-honor i{ color:#f5c542; font-size:13px; }
+    body.light .hero-jr .jr-honor{
+      background: rgba(255,255,255,0.75);
+      border-color: rgba(0,0,0,0.12);
+      color:#0e0e0e;
     }
     /* Body grid */
     .hero-jr .jr-body{
@@ -590,8 +604,8 @@
     }
     @media (max-width: 820px){
       .hero-jr{ padding: 100px 20px 40px; min-height:auto; }
-      .hero-jr .jr-ghost{ font-size: 26vw; top:40px; }
-      .hero-jr .jr-name{ font-size: clamp(2.2rem, 13vw, 5rem); margin-top: 60px; }
+      .hero-jr .jr-ghost{ display:none; }
+      .hero-jr .jr-name{ font-size: clamp(2.2rem, 13vw, 5rem); margin-top: 0; }
       .hero-jr .jr-portrait{
         position:relative; left:auto; top:auto; transform:none;
         margin: 24px auto 0; width: min(75vw, 380px);
@@ -623,8 +637,7 @@
     }
     @media (max-width: 480px){
       .hero-jr{ padding: 90px 16px 32px; }
-      .hero-jr .jr-ghost{ font-size: 30vw; top:30px; }
-      .hero-jr .jr-name{ font-size: clamp(1.9rem, 14vw, 3rem); letter-spacing:0; margin-top: 40px; }
+      .hero-jr .jr-name{ font-size: clamp(1.9rem, 14vw, 3rem); letter-spacing:0; margin-top: 0; }
       .hero-jr .jr-portrait{ width: 78vw; }
       .hero-jr .jr-intro{ font-size: .9rem; }
       .hero-jr .jr-services{ font-size: .85rem; gap: 8px 14px; }
@@ -1964,12 +1977,14 @@
       <a href="#certifications"><span class="dot-idx">05</span><span class="dot-mark"></span><span class="dot-label">Certs</span></a>
       <a href="#contact"><span class="dot-idx">06</span><span class="dot-mark"></span><span class="dot-label">Contact</span></a>
     </div>
-    <button class="theme-btn" id="theme-toggle" aria-label="Toggle theme">
-      <i class="fa-solid fa-moon"></i>
-    </button>
-    <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+    <div class="nav-actions">
+      <button class="theme-btn" id="theme-toggle" aria-label="Toggle theme">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
   </nav>
 
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
@@ -2004,7 +2019,8 @@
       <h1 class="jr-name">ARCHIE DELA CRUZ</h1>
 
       <div class="jr-portrait">
-        <img src="images/man.png" alt="Archie Dela Cruz">
+        <img src="images/grad1.png" alt="Archie Dela Cruz">
+        <span class="jr-honor"><i class="fa-solid fa-graduation-cap"></i> Cum Laude</span>
       </div>
 
       <div class="jr-body">
