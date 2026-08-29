@@ -2585,50 +2585,6 @@ defer
 ></script>
 
   <script>
-    // Buttery smooth scrolling on desktop wheel input — eases toward the target instead of
-    // jumping instantly. Skipped on touch devices (native momentum is already smooth there),
-    // on reduced-motion preference, and while a modal is open (so its own internal scroll
-    // — e.g. the tech/projects "view all" panels — keeps working natively).
-    (function smoothScrollInit(){
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-      if (reduceMotion || isTouch) return;
-
-      let current = window.scrollY;
-      let target = window.scrollY;
-      let raf = null;
-      const ease = 0.1;
-
-      const clamp = v => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        return Math.max(0, Math.min(v, max));
-      };
-
-      function tick(){
-        current += (target - current) * ease;
-        if (Math.abs(target - current) < 0.5){
-          current = target;
-          window.scrollTo(0, current);
-          raf = null;
-          return;
-        }
-        window.scrollTo(0, current);
-        raf = requestAnimationFrame(tick);
-      }
-
-      window.addEventListener('wheel', (e) => {
-        if (e.ctrlKey || document.body.classList.contains('no-scroll')) return;
-        e.preventDefault();
-        target = clamp(target + e.deltaY);
-        if (!raf) raf = requestAnimationFrame(tick);
-      }, { passive: false });
-
-      // Keep in sync with scrolling that didn't come from our own tick (keyboard, scrollbar drag, anchor links)
-      window.addEventListener('scroll', () => {
-        if (!raf) current = target = window.scrollY;
-      }, { passive: true });
-    })();
-
     // GitHub — live heatmap + count cards
     (function ghInit(){
       const USER = 'tyieeee';
