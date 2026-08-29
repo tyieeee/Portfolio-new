@@ -48,7 +48,7 @@
       line-height:1.6;
       overflow-x:hidden;
       padding-left: 0;
-      transition: background .4s ease, color .4s ease, padding-left .5s cubic-bezier(.4,0,.2,1);
+      transition: padding-left .5s cubic-bezier(.4,0,.2,1);
     }
     a{ color:inherit; text-decoration:none; }
     img{ display:block; max-width:100%; }
@@ -1170,6 +1170,96 @@
       background: linear-gradient(to bottom, #dcdcdc 0%, #c4c4c4 60%, #a8a8a8 100%);
       border-color: #c0c0c0;
     }
+    /* Phone mockup frame — for mobile-first / web apps shown on a handset instead of a laptop */
+    .p-media.phone{
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 34px;
+      padding: 12px;
+      overflow: visible;
+      aspect-ratio: 9 / 18.8;
+      max-width: 260px;
+      margin: 0 auto;
+      box-shadow: 0 30px 60px -25px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    /* Speaker/camera pill at the top */
+    .p-media.phone::before{
+      content:'';
+      position:absolute; top:22px; left:50%; transform: translateX(-50%);
+      width: 50px; height: 5px; border-radius: 999px;
+      background: #0a0a0a;
+      z-index: 2;
+    }
+    .p-media.phone img,
+    .p-media.phone video{
+      object-fit: cover; object-position: top center;
+      width: 100%; height: 100%;
+      border-radius: 24px;
+      background: #0a0a0a;
+      filter: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+      display:block;
+    }
+    .p-media.phone:hover img,
+    .p-media.phone:hover video{ transform: scale(1.01); filter: none; }
+    .p-media.phone .num{ top: 30px; left: 50%; transform: translateX(-50%); }
+    body.light .p-media.phone{
+      background: #e9e9e9;
+      border-color: #d0d0d0;
+    }
+    /* Two-phone mockup — same handset, fanned front/back like a marketing mockup */
+    .p-media.phone-duo{
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      overflow: visible;
+      aspect-ratio: auto;
+      min-height: 380px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .p-media.phone-duo img{ filter: none; transition: none; }
+    .p-media.phone-duo:hover img{ transform: none; filter: none; }
+    .p-media.phone-duo .phone-mock{
+      position: relative;
+      width: 160px;
+      aspect-ratio: 9 / 18.8;
+      background: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      border-radius: 30px;
+      padding: 10px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -25px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: transform .35s ease;
+    }
+    .p-media.phone-duo .phone-mock::before{
+      content:'';
+      position:absolute; top:16px; left:50%; transform: translateX(-50%);
+      width: 38px; height: 5px; border-radius: 999px;
+      background: #0a0a0a;
+      z-index: 2;
+    }
+    .p-media.phone-duo .phone-mock img{
+      width:100%; height:100%; object-fit: cover; object-position: top center;
+      border-radius: 20px; background:#0a0a0a; display:block;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .p-media.phone-duo .phone-mock.back{
+      margin-right: -55px;
+      transform: rotate(-9deg) translateY(-14px);
+      filter: brightness(.65) saturate(.9);
+      z-index: 1;
+    }
+    .p-media.phone-duo .phone-mock.front{
+      transform: rotate(7deg) translateY(10px);
+      z-index: 2;
+    }
+    .p-media.phone-duo:hover .phone-mock.front{ transform: rotate(7deg) translateY(6px) scale(1.03); }
+    .p-media.phone-duo:hover .phone-mock.back{ transform: rotate(-9deg) translateY(-18px) scale(1.01); }
+    .p-media.phone-duo .num{ z-index: 3; }
+    body.light .p-media.phone-duo .phone-mock{
+      background: #e9e9e9;
+      border-color: #d0d0d0;
+    }
     .p-media .num{
       position:absolute; top:14px; left:14px;
       font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.16em;
@@ -1242,6 +1332,15 @@
       opacity:1; pointer-events:auto; z-index:2; cursor:default;
       transform: translate(-50%, -50%) rotate(0) scale(1);
     }
+    /* Phone-duo sized down to match the laptop cards' footprint inside the fixed-height deck */
+    .proj-card.phone-duo{ min-height: 0; }
+    .proj-card.phone-duo .phone-mock{ width: 120px; height: auto; aspect-ratio: 9 / 18.8; }
+    .proj-card.phone-duo .phone-mock.back{ margin-right: -42px; }
+    /* Narrower than the laptops, so it needs a wider offset to peek out from behind the center card */
+    .proj-card.phone-duo.is-prev{ transform: translate(calc(-50% - 260px), -50%) rotate(-9deg) scale(.85); }
+    .proj-card.phone-duo.is-next{ transform: translate(calc(-50% + 260px), -50%) rotate(9deg) scale(.85); }
+    /* Sized up a bit when centered so it doesn't read small next to the laptops */
+    .proj-card.phone-duo.is-active .phone-mock{ width: 155px; }
     .proj-info{
       max-width: 620px; margin: 48px auto 0;
       text-align:center;
@@ -1275,11 +1374,23 @@
       color: var(--text-dim); font-size: 0.98rem; line-height:1.65;
       margin: 0 auto 22px;
     }
-    .proj-info-tags{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
-    .proj-info-tags span{
+    .proj-info-tags{
+      overflow: hidden;
+    }
+    .proj-info-tags-track{
+      display:flex; width:max-content;
+      animation: projTagsMarquee 14s linear infinite;
+    }
+    .proj-info-tags-track span{
       font-size: 12px; color: var(--text-dim);
       padding: 5px 12px; border-radius: 999px;
       border: 1px solid var(--line); background: var(--bg-card);
+      white-space: nowrap;
+      margin-right: 8px;
+    }
+    @keyframes projTagsMarquee{ to{ transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce){
+      .proj-info-tags-track{ animation:none; }
     }
     /* Mobile keeps the same fanned layout, scaled down — swipe left/right to navigate instead of clicking */
     @media (max-width: 900px){
@@ -1287,10 +1398,20 @@
       .proj-card{ width: min(280px, 76%); }
       .proj-card.is-prev{ transform: translate(calc(-50% - 80px), -50%) rotate(-8deg) scale(.85); }
       .proj-card.is-next{ transform: translate(calc(-50% + 80px), -50%) rotate(8deg) scale(.85); }
+      .proj-card.phone-duo .phone-mock{ width: 90px; }
+      .proj-card.phone-duo .phone-mock.back{ margin-right: -32px; }
+      .proj-card.phone-duo.is-prev{ transform: translate(calc(-50% - 115px), -50%) rotate(-8deg) scale(.85); }
+      .proj-card.phone-duo.is-next{ transform: translate(calc(-50% + 115px), -50%) rotate(8deg) scale(.85); }
+      .proj-card.phone-duo.is-active .phone-mock{ width: 105px; }
     }
     @media (max-width: 420px){
       .proj-deck{ height: 210px; }
       .proj-card{ width: min(230px, 74%); }
+      .proj-card.phone-duo .phone-mock{ width: 74px; }
+      .proj-card.phone-duo .phone-mock.back{ margin-right: -26px; }
+      .proj-card.phone-duo.is-prev{ transform: translate(calc(-50% - 80px), -50%) rotate(-7deg) scale(.82); }
+      .proj-card.phone-duo.is-next{ transform: translate(calc(-50% + 80px), -50%) rotate(7deg) scale(.82); }
+      .proj-card.phone-duo.is-active .phone-mock{ width: 86px; }
       .proj-card.is-prev{ transform: translate(calc(-50% - 55px), -50%) rotate(-7deg) scale(.82); }
       .proj-card.is-next{ transform: translate(calc(-50% + 55px), -50%) rotate(7deg) scale(.82); }
     }
@@ -1751,6 +1872,14 @@
       .p-media.contain::before{ left: 10px; top: 7px; }
       .p-media.contain::after{ left: -3%; right: -3%; height: 9px; bottom: -9px; }
       .p-media.contain .num{ top: 30px; left: 16px; font-size: 10px; padding: 4px 9px; }
+      .p-media.phone{ max-width: 200px; border-radius: 28px; padding: 10px; }
+      .p-media.phone::before{ top: 16px; width: 40px; }
+      .p-media.phone img, .p-media.phone video{ border-radius: 20px; }
+      .p-media.phone .num{ top: 22px; font-size: 10px; padding: 4px 9px; }
+      .p-media.phone-duo{ min-height: 300px; }
+      .p-media.phone-duo .phone-mock{ width: 130px; border-radius: 24px; padding: 8px; }
+      .p-media.phone-duo .phone-mock.back{ margin-right: -44px; }
+      .p-media.phone-duo .phone-mock img{ border-radius: 16px; }
       .gh-head{ flex-direction: column; align-items: flex-start; gap: 12px; }
       .gh-link{ width: 100%; justify-content: center; }
       .gh-user .h{ font-size: 1.1rem; }
@@ -1784,6 +1913,10 @@
       .about-card, .journey-card, .gh-card{ padding: 18px 14px; }
       .p-media.contain{ padding: 20px 8px 8px; }
       .p-media.contain .num{ top: 28px; left: 14px; }
+      .p-media.phone{ max-width: 170px; }
+      .p-media.phone-duo{ min-height: 260px; }
+      .p-media.phone-duo .phone-mock{ width: 110px; }
+      .p-media.phone-duo .phone-mock.back{ margin-right: -36px; }
       .gh-chart img{ min-width: 0; width: 100%; }
       section.block{ padding: 64px 0; }
       .contact{ padding: 0; border-radius: 0; }
@@ -1825,9 +1958,9 @@
       <span class="dot-progress" aria-hidden="true"></span>
       <a href="#about"><span class="dot-idx">00</span><span class="dot-mark"></span><span class="dot-label">About</span></a>
       <a href="#projects"><span class="dot-idx">01</span><span class="dot-mark"></span><span class="dot-label">Projects</span></a>
-      <a href="#tech"><span class="dot-idx">02</span><span class="dot-mark"></span><span class="dot-label">Stack</span></a>
-      <a href="#experience"><span class="dot-idx">03</span><span class="dot-mark"></span><span class="dot-label">Experience</span></a>
-      <a href="#github"><span class="dot-idx">04</span><span class="dot-mark"></span><span class="dot-label">GitHub</span></a>
+      <a href="#github"><span class="dot-idx">02</span><span class="dot-mark"></span><span class="dot-label">GitHub</span></a>
+      <a href="#tech"><span class="dot-idx">03</span><span class="dot-mark"></span><span class="dot-label">Stack</span></a>
+      <a href="#experience"><span class="dot-idx">04</span><span class="dot-mark"></span><span class="dot-label">Experience</span></a>
       <a href="#certifications"><span class="dot-idx">05</span><span class="dot-mark"></span><span class="dot-label">Certs</span></a>
       <a href="#contact"><span class="dot-idx">06</span><span class="dot-mark"></span><span class="dot-label">Contact</span></a>
     </div>
@@ -1849,9 +1982,9 @@
       <nav class="mobile-menu-links">
         <a href="#about" data-menu-close><span class="mm-idx">00</span><span class="mm-dot"></span><span class="mm-label">About</span><i class="fa-solid fa-arrow-right"></i></a>
         <a href="#projects" data-menu-close><span class="mm-idx">01</span><span class="mm-dot"></span><span class="mm-label">Projects</span><i class="fa-solid fa-arrow-right"></i></a>
-        <a href="#tech" data-menu-close><span class="mm-idx">02</span><span class="mm-dot"></span><span class="mm-label">Stack</span><i class="fa-solid fa-arrow-right"></i></a>
-        <a href="#experience" data-menu-close><span class="mm-idx">03</span><span class="mm-dot"></span><span class="mm-label">Experience</span><i class="fa-solid fa-arrow-right"></i></a>
-        <a href="#github" data-menu-close><span class="mm-idx">04</span><span class="mm-dot"></span><span class="mm-label">GitHub</span><i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#github" data-menu-close><span class="mm-idx">02</span><span class="mm-dot"></span><span class="mm-label">GitHub</span><i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#tech" data-menu-close><span class="mm-idx">03</span><span class="mm-dot"></span><span class="mm-label">Stack</span><i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#experience" data-menu-close><span class="mm-idx">04</span><span class="mm-dot"></span><span class="mm-label">Experience</span><i class="fa-solid fa-arrow-right"></i></a>
         <a href="#certifications" data-menu-close><span class="mm-idx">05</span><span class="mm-dot"></span><span class="mm-label">Certs</span><i class="fa-solid fa-arrow-right"></i></a>
         <a href="#contact" data-menu-close><span class="mm-idx">06</span><span class="mm-dot"></span><span class="mm-label">Contact</span><i class="fa-solid fa-arrow-right"></i></a>
       </nav>
@@ -1996,13 +2129,14 @@
           <span class="num">01 / Web</span>
           <img src="images/shoe.png" alt="Shoe Branding Website landing page" loading="lazy">
         </div>
-        <div class="proj-card p-media contain is-active" tabindex="0">
+        <div class="proj-card p-media contain is-next" tabindex="0">
           <span class="num">02 / Full Stack</span>
           <img src="images/fp.png" alt="FlushPoint PH landing page" loading="lazy">
         </div>
-        <div class="proj-card p-media contain is-next" tabindex="0">
-          <span class="num">04 / Outfit App</span>
-          <img src="images/chroma.png" alt="ChromaFit landing page" loading="lazy">
+        <div class="proj-card p-media phone-duo is-active" tabindex="0">
+          <span class="num">05 / Web App</span>
+          <div class="phone-mock back"><img src="images/eschool2.png" alt="" loading="lazy"></div>
+          <div class="phone-mock front"><img src="images/eschool.png" alt="E-School app screens" loading="lazy"></div>
         </div>
       </div>
 
@@ -2012,7 +2146,12 @@
         </a>
         <h3 class="proj-info-title" id="projInfoTitle">FlushPoint <span class="it">PH</span></h3>
         <p class="proj-info-desc" id="projInfoDesc">Locate, review, and navigate to nearby comfort rooms (CR) in your area. A full-stack capstone build covering geolocation, user reviews, authentication, and an admin dashboard.</p>
-        <div class="proj-info-tags" id="projInfoTags"><span>Laravel</span><span>PHP</span><span>MySQL</span><span>Maps API</span></div>
+        <div class="proj-info-tags">
+          <div class="proj-info-tags-track" id="projInfoTags">
+            <span>Laravel</span><span>PHP</span><span>MySQL</span><span>Maps API</span>
+            <span>Laravel</span><span>PHP</span><span>MySQL</span><span>Maps API</span>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -2090,10 +2229,100 @@
               <a class="btn btn-ghost" href="https://chromafit-lemon.vercel.app/" target="_blank">View Project <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </div>
           </article>
+
+          <!-- Project 05 — image left, text right -->
+          <article class="p-row">
+            <a class="p-media phone-duo" href="https://e-school-psi-bice.vercel.app/" target="_blank">
+              <span class="num">05 / Web App</span>
+              <div class="phone-mock back"><img src="images/eschool2.png" alt="" loading="lazy"></div>
+              <div class="phone-mock front"><img src="images/eschool.png" alt="E-School app onboarding screen" loading="lazy"></div>
+            </a>
+            <div class="p-copy">
+              <span class="p-eyebrow">Project 05 — Web App</span>
+              <h3>E-<span class="it">School</span></h3>
+              <p>A safety-focused school companion web app that keeps students and parents connected — secure login, instant alerts, and a mobile-first experience built to stay simple under pressure.</p>
+              <div class="p-tags"><span>JavaScript</span><span>TypeScript</span><span>PostgreSQL</span></div>
+              <a class="btn btn-ghost" href="https://e-school-psi-bice.vercel.app/" target="_blank">Visit Live Site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+          </article>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- GitHub Contribution -->
+  <section class="block" id="github" style="padding-top: 0;">
+    <div class="wrap">
+      <span class="eyebrow reveal">Activity</span>
+      <h2 class="section-title reveal">GitHub <span class="it">Contributions</span></h2>
+      <p class="section-sub reveal">A live snapshot of my coding activity — every square is a commit shipped.</p>
+
+      <div class="gh-card reveal">
+        <div class="gh-head">
+          <div class="gh-user">
+            <i class="fa-brands fa-github"></i>
+            <div>
+              <div class="h">@tyieeee</div>
+              <div class="s">github.com/tyieeee</div>
+            </div>
+          </div>
+          <a class="gh-link" id="gh-overview-link" href="https://github.com/tyieeee" target="_blank">
+            View Overview <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+        <div class="gh-total" id="gh-total">Loading contributions…</div>
+        <div class="gh-chart">
+          <div class="gh-months" id="gh-months" aria-hidden="true"></div>
+          <div class="gh-grid" id="gh-grid" role="img" aria-label="GitHub contribution heatmap"></div>
+        </div>
+        <div class="gh-legend">
+          <span>Less</span>
+          <span class="gh-cell" data-l="0"></span>
+          <span class="gh-cell" data-l="1"></span>
+          <span class="gh-cell" data-l="2"></span>
+          <span class="gh-cell" data-l="3"></span>
+          <span class="gh-cell" data-l="4"></span>
+          <span>More</span>
+        </div>
+
+        <div class="gh-stats">
+          <a class="gh-stat" href="https://github.com/tyieeee" target="_blank" rel="noopener">
+            <div class="gs-head"><i class="fa-solid fa-chart-simple"></i> Contributions</div>
+            <div class="gs-num" id="gs-contrib">—</div>
+            <div class="gs-sub">in the last year</div>
+          </a>
+          <a class="gh-stat" href="https://github.com/tyieeee?tab=overview" target="_blank" rel="noopener">
+            <div class="gs-head"><i class="fa-solid fa-code-commit"></i> Commits</div>
+            <div class="gs-num" id="gs-commits">—</div>
+            <div class="gs-sub">recent public pushes</div>
+          </a>
+          <a class="gh-stat" href="https://github.com/tyieeee?tab=repositories" target="_blank" rel="noopener">
+            <div class="gs-head"><i class="fa-solid fa-folder-open"></i> Projects</div>
+            <div class="gs-num" id="gs-projects">—</div>
+            <div class="gs-sub">public repositories</div>
+          </a>
+        </div>
+
+        <div class="gh-achievements">
+          <div class="gh-ach-head"><i class="fa-solid fa-trophy"></i> Achievements</div>
+          <div class="ach-row">
+            <a class="ach-badge" href="https://github.com/tyieeee" target="_blank" rel="noopener">
+              <div class="ach-icon"><i class="fa-solid fa-code-pull-request"></i><span class="ach-mult">×2</span></div>
+              <span class="ach-label">Pull Shark</span>
+            </a>
+            <a class="ach-badge" href="https://github.com/tyieeee" target="_blank" rel="noopener">
+              <div class="ach-icon"><i class="fa-solid fa-people-arrows"></i></div>
+              <span class="ach-label">Pair Extraordinaire</span>
+            </a>
+            <a class="ach-badge" href="https://github.com/tyieeee" target="_blank" rel="noopener">
+              <div class="ach-icon"><i class="fa-solid fa-bolt"></i></div>
+              <span class="ach-label">YOLO</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Tech -->
   <section class="block" id="tech">
@@ -2242,80 +2471,6 @@
     </div>
   </section>
 
-  <!-- GitHub Contribution -->
-  <section class="block" id="github" style="padding-top: 0;">
-    <div class="wrap">
-      <span class="eyebrow reveal">Activity</span>
-      <h2 class="section-title reveal">GitHub <span class="it">Contributions</span></h2>
-      <p class="section-sub reveal">A live snapshot of my coding activity — every square is a commit shipped.</p>
-
-      <div class="gh-card reveal">
-        <div class="gh-head">
-          <div class="gh-user">
-            <i class="fa-brands fa-github"></i>
-            <div>
-              <div class="h">@tyieeee</div>
-              <div class="s">github.com/tyieeee</div>
-            </div>
-          </div>
-          <a class="gh-link" id="gh-overview-link" href="https://github.com/tyieeee" target="_blank">
-            View Overview <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
-        </div>
-        <div class="gh-total" id="gh-total">Loading contributions…</div>
-        <div class="gh-chart">
-          <div class="gh-months" id="gh-months" aria-hidden="true"></div>
-          <div class="gh-grid" id="gh-grid" role="img" aria-label="GitHub contribution heatmap"></div>
-        </div>
-        <div class="gh-legend">
-          <span>Less</span>
-          <span class="gh-cell" data-l="0"></span>
-          <span class="gh-cell" data-l="1"></span>
-          <span class="gh-cell" data-l="2"></span>
-          <span class="gh-cell" data-l="3"></span>
-          <span class="gh-cell" data-l="4"></span>
-          <span>More</span>
-        </div>
-
-        <div class="gh-stats">
-          <a class="gh-stat" href="https://github.com/tyieeee" target="_blank" rel="noopener">
-            <div class="gs-head"><i class="fa-solid fa-chart-simple"></i> Contributions</div>
-            <div class="gs-num" id="gs-contrib">—</div>
-            <div class="gs-sub">in the last year</div>
-          </a>
-          <a class="gh-stat" href="https://github.com/tyieeee?tab=overview" target="_blank" rel="noopener">
-            <div class="gs-head"><i class="fa-solid fa-code-commit"></i> Commits</div>
-            <div class="gs-num" id="gs-commits">—</div>
-            <div class="gs-sub">recent public pushes</div>
-          </a>
-          <a class="gh-stat" href="https://github.com/tyieeee?tab=repositories" target="_blank" rel="noopener">
-            <div class="gs-head"><i class="fa-solid fa-folder-open"></i> Projects</div>
-            <div class="gs-num" id="gs-projects">—</div>
-            <div class="gs-sub">public repositories</div>
-          </a>
-        </div>
-
-        <div class="gh-achievements">
-          <div class="gh-ach-head"><i class="fa-solid fa-trophy"></i> Achievements</div>
-          <div class="ach-row">
-            <a class="ach-badge" href="https://github.com/tyieeee" target="_blank" rel="noopener">
-              <div class="ach-icon"><i class="fa-solid fa-code-pull-request"></i><span class="ach-mult">×2</span></div>
-              <span class="ach-label">Pull Shark</span>
-            </a>
-            <a class="ach-badge" href="https://github.com/tyieeee" target="_blank" rel="noopener">
-              <div class="ach-icon"><i class="fa-solid fa-people-arrows"></i></div>
-              <span class="ach-label">Pair Extraordinaire</span>
-            </a>
-            <a class="ach-badge" href="https://github.com/tyieeee" target="_blank" rel="noopener">
-              <div class="ach-icon"><i class="fa-solid fa-bolt"></i></div>
-              <span class="ach-label">YOLO</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Certifications -->
   <section class="block" id="certifications">
     <div class="wrap">
@@ -2430,6 +2585,50 @@ defer
 ></script>
 
   <script>
+    // Buttery smooth scrolling on desktop wheel input — eases toward the target instead of
+    // jumping instantly. Skipped on touch devices (native momentum is already smooth there),
+    // on reduced-motion preference, and while a modal is open (so its own internal scroll
+    // — e.g. the tech/projects "view all" panels — keeps working natively).
+    (function smoothScrollInit(){
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+      if (reduceMotion || isTouch) return;
+
+      let current = window.scrollY;
+      let target = window.scrollY;
+      let raf = null;
+      const ease = 0.1;
+
+      const clamp = v => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        return Math.max(0, Math.min(v, max));
+      };
+
+      function tick(){
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5){
+          current = target;
+          window.scrollTo(0, current);
+          raf = null;
+          return;
+        }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || document.body.classList.contains('no-scroll')) return;
+        e.preventDefault();
+        target = clamp(target + e.deltaY);
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+
+      // Keep in sync with scrolling that didn't come from our own tick (keyboard, scrollbar drag, anchor links)
+      window.addEventListener('scroll', () => {
+        if (!raf) current = target = window.scrollY;
+      }, { passive: true });
+    })();
+
     // GitHub — live heatmap + count cards
     (function ghInit(){
       const USER = 'tyieeee';
@@ -2461,11 +2660,11 @@ defer
         const numEl = document.getElementById('gs-contrib');
         if (!grid) return;
         try{
-          const res = await fetch(`https://github-contributions-api.deno.dev/tyieeee.json`, { cache: 'no-store' });
+          const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${USER}?y=last`, { cache: 'no-store' });
           if (!res.ok) throw new Error('API error ' + res.status);
           const data = await res.json();
-          const allDays = data.contributions.flat() || [];
-          const yearTotal = data.totalContributions || allDays.reduce((s,d)=>s+(d.contributionCount||0),0);
+          const allDays = data.contributions || [];
+          const yearTotal = data.total?.lastYear ?? allDays.reduce((s,d)=>s+(d.count||0),0);
 
           // On mobile, show only the last ~6 months so recent (green) squares are visible
           const isMobile = window.matchMedia('(max-width: 720px)').matches;
@@ -2483,15 +2682,8 @@ defer
             const el = document.createElement('div');
             el.className = 'gh-cell';
             if (d){
-              // Convert exact hex colors back to level 0-4 for CSS variables
-              let level = 0;
-              if(d.contributionLevel === "FIRST_QUARTILE") level = 1;
-              else if(d.contributionLevel === "SECOND_QUARTILE") level = 2;
-              else if(d.contributionLevel === "THIRD_QUARTILE") level = 3;
-              else if(d.contributionLevel === "FOURTH_QUARTILE") level = 4;
-              
-              el.dataset.l = String(level);
-              el.title = `${d.contributionCount} contribution${d.contributionCount===1?'':'s'} on ${d.date}`;
+              el.dataset.l = String(d.level || 0);
+              el.title = `${d.count} contribution${d.count===1?'':'s'} on ${d.date}`;
             } else { el.style.visibility = 'hidden'; }
             frag.appendChild(el);
           });
@@ -2790,11 +2982,11 @@ defer
           href: 'https://flushpointph.com/'
         },
         {
-          title: 'Chroma<span class="it">Fit</span>',
-          desc: 'An outfit styling app that helps users find the perfect clothing combinations based on selected color palettes, with smart outfit suggestions and personalized recommendations.',
-          tags: ['React', 'TypeScript', 'Tailwind', 'UI/UX'],
-          ctaLabel: 'View Project',
-          href: 'https://chromafit-lemon.vercel.app/'
+          title: 'E-<span class="it">School</span>',
+          desc: 'A safety-focused school companion web app that keeps students and parents connected — secure login, instant alerts, and a mobile-first experience built to stay simple under pressure.',
+          tags: ['JavaScript', 'TypeScript', 'PostgreSQL'],
+          ctaLabel: 'Visit Live Site',
+          href: 'https://e-school-psi-bice.vercel.app/'
         }
       ];
 
@@ -2810,7 +3002,8 @@ defer
         if (!p) return;
         infoTitle.innerHTML = p.title;
         infoDesc.textContent = p.desc;
-        infoTags.innerHTML = p.tags.map(t => `<span>${t}</span>`).join('');
+        const tagsHTML = p.tags.map(t => `<span>${t}</span>`).join('');
+        infoTags.innerHTML = tagsHTML + tagsHTML;
         infoCtaLabel.textContent = p.ctaLabel;
         infoCta.href = p.href;
         if (infoPanel){
